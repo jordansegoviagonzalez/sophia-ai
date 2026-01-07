@@ -1,32 +1,22 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
-*.egg-info/
-build/
-dist/
+# Ignore Models and Processed Data
+models/sophia-finetuned/
+models/sophia-v1-standalone/
+models/checkpoints/
+*.safetensors
+*.bin
+*.pth
 
-# Virtual environments
+# Ignore Processed Datasets (Keep Raw)
+ai-ml-backend-datasets/processed/
+*.arrow
+*.cache
+
+# Python & Environment
+__pycache__/
+*.pyc
 .venv/
 venv/
-env/
-
-# IDE / editor
-.vscode/
-.idea/
-*.swp
 .DS_Store
-
-# Jupyter
-.ipynb_checkpoints/
-
-# Logs
-logs/
-*.log
-
-# Secrets (if you create them)
-.env
-*.secret.json
-*.key.json
+.envmodels/sophia-v1-standalone/
+*.safetensors
+*.bin

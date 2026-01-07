@@ -1,225 +1,97 @@
-# Sophia – Interview Question Coach (ML + LLM System)
+![alt text](Sophia-AI.png)
+# Sophia AI - Enterprise Interview Coach
 
-Sophia is a **mini interview coach** for ML / LLM / backend roles.
+**Sophia** is a domain-specific, fine-tuned Large Language Model (LLM) designed to act as an expert technical interviewer for AI/ML, Backend, and MLOps roles.
 
-You give Sophia an interview question in plain language. Behind the scenes she:
-
-1. Classifies the question into a topic (ML basics, loss functions, Transformers, RAG, deployment, etc.).  
-2. Retrieves your **own notes** for that topic from simple `.md` files.  
-3. Builds a structured prompt and (later) sends it to an LLM (local or cloud).  
-4. Returns a response with:
-   - A technical answer (interview-style)  
-   - A simple explanation (to check understanding)  
-   - One follow-up question
-
-This project is designed to show **end-to-end ML + LLM system design**:
-
-- Classical ML (scikit-learn classifier, train/test, persisted model)  
-- Lightweight RAG (note-based knowledge store)  
-- LLM orchestration (prompt building, response schema)  
-- Clean architecture, tests, and documentation  
+Unlike generic wrappers, Sophia operates on a **Full Ownership** model. She is not an API call to OpenAI; she is a standalone, 1.5B parameter neural network fine tuned on a proprietary **Enterprise Knowledge Lake**.
 
 ---
 
-## Project Structure
+## 🚀 Key Features
+
+*   **🧠 Custom Fine-Tuned Brain:** Built on a 1.5B parameter foundation, fine-tuned using **QLoRA** on a high-density technical corpus.
+*   **🤗 Model Weights:** [Download Sophia-V1 from Hugging Face](https://huggingface.co/jordansegovia/sophia-v1)
+*   **📚 Enterprise Knowledge Lake:** A curated ontology of engineering wisdom (`ai-ml-backend-datasets`), structured into domains like MLOps, Deep Learning, and System Design.
+*   **🛠️ Synthetic Alignment:** Uses **Targeted Data Augmentation** to correct common base-model hallucinations (e.g., enforcing "GPT is Decoder-Only", "No MSE for Classification").
+*   **⚡ Local Inference:** Runs 100% locally on Apple Silicon (MPS/Metal) or CUDA. No data leaves your machine.
+
+---
+
+## 🏗️ Architecture
+
+The system follows a modern **Instruction Tuning** pipeline:
+
+1.  **Ingestion:** Raw Markdown notes are ingested from `ai-ml-backend-datasets`.
+2.  **Feature Engineering:**
+    *   Data is deduplicated (SHA256 hashing).
+    *   Filtered for quality and language.
+    *   Augmented with synthetic "Hard Negatives" to fix reasoning gaps.
+3.  **Training:**
+    *   **Base:** Qwen 2.5 (1.5B).
+    *   **Adapter:** LoRA (Rank 16, Alpha 32).
+    *   **Merge:** Weights are fused into a standalone artifact (`models/sophia-v1-standalone`).
+
+---
+
+## 📂 Project Structure
 
 ```text
-sophia/
-├── README.md
-├── requirements.txt
-├── .gitignore
-│
-├── data/
-│   └── questions_labeled.csv        # labeled interview questions
-│
-├── notes/                           # your curated study notes
-│   ├── ml_basics.md
-│   ├── loss_functions.md
-│   ├── llm_transformers.md
-│   ├── rag.md
-│   └── deployment.md
+sophia-ai/
+├── ai-ml-backend-datasets/      # (External) The Source of Truth
+│   ├── raw/domain_knowledge/    # The "Gold" Corpus (Markdown)
+│   └── processed/               # The "Fuel" (Tokenized Arrow Files)
 │
 ├── models/
-│   └── topic_classifier.joblib      # trained topic classifier
+│   ├── sophia-v1-standalone/    # The Fused, Production-Ready Model
+│   └── README.md                # Model Card (Hyperparameters)
+│
+├── scripts/
+│   ├── prepare_data.py          # ETL Pipeline (Clean -> Hash -> Split)
+│   ├── finetune_llm.py          # Training Loop (Hugging Face Trainer)
+│   ├── augment_data.py          # Synthetic Data Generator
+│   └── audit_data_quality.py    # Forensic Data Unit Tests
 │
 ├── src/
 │   └── sophia/
-│       ├── __init__.py
-│       ├── config.py
-│       ├── topics.py
-│       ├── schemas.py
-│       ├── classifier.py
-│       ├── knowledge_base.py
-│       ├── llm_client.py
-│       ├── pipeline.py
-│       └── cli.py
-│
-├── scripts/
-│   └── train_classifier.py
-│
-└── tests/
-    ├── test_classifier.py
-    ├── test_knowledge_base.py
-    └── test_pipeline.py
+│       └── llm_client.py        # Inference Engine
 ```
 
 ---
 
-## Setup
+## 🛠️ Quick Start
 
+### 1. Setup Environment
 ```bash
-cd sophia
-
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
----
-
-## Data: Labeled Questions
-
-Create `data/questions_labeled.csv` with at least a few examples per topic:
-
-```csv
-question,topic
-"What is overfitting and how do you prevent it?",ml_basics
-"Explain cross-entropy loss.",loss_functions
-"How does attention work in Transformers?",llm_transformers
-"Describe a RAG (Retrieval-Augmented Generation) system.",rag
-"How would you deploy an LLM-backed API to production?",deployment
-```
-
-You can expand this file over time.
-
----
-
-## Notes: Your Knowledge Base
-
-Each `.md` file in `notes/` is your “golden” summary for that topic. For example:
-
-`notes/ml_basics.md`:
-
-```markdown
-# ML Basics
-
-- Overfitting: model fits noise instead of signal.
-- Prevent with: more data, regularization, dropout, simpler model, early stopping.
-- Always keep a held-out validation set for tuning.
-```
-
-Sophia will search these notes to provide grounded answers.
-
----
-
-## Training the Topic Classifier
-
-The topic classifier is a simple **TF-IDF + Logistic Regression** model trained with scikit-learn.
-
-Train it via:
-
+### 2. Train the Model (Optional)
+If you want to reproduce the weights from the raw knowledge base:
 ```bash
-python -m scripts.train_classifier
+# 1. Build the Dataset
+python scripts/prepare_data.py
+
+# 2. Run Fine-Tuning
+python scripts/finetune_llm.py
 ```
 
-This will:
-
-- Load `data/questions_labeled.csv`  
-- Split into train/test  
-- Train the pipeline  
-- Print a classification report  
-- Save the model to `models/topic_classifier.joblib`  
-
----
-
-## Running Sophia (CLI)
-
-Once the classifier is trained and you have notes, run:
-
+### 3. Chat with Sophia
+Launch the interactive shell to interview the model.
 ```bash
-PYTHONPATH=src python -m sophia.cli
+PYTHONPATH=src python scripts/chat.py
 ```
-
-Example session:
-
-```text
-Sophia 🧠 – Interview Question Coach
-Type 'exit' to quit.
-
-Your interview question> How do you prevent overfitting in a neural network?
-
-============================================================
-[Topic: ml_basics]  [Source: model_only]
-
-Technical answer:
-...
-
-Simple explanation:
-...
-
-Follow-up question:
-...
-============================================================
-```
-
-Out of the box, the LLM client is a **stub** that echoes where the LLM answer will go.  
-You can later plug in:
-
-- Local models (Ollama, llama.cpp, etc.)  
-- Cloud LLMs (Azure OpenAI, OpenAI, etc.)  
-
-by editing `llm_client.py` and using your own keys (not committed to git).
 
 ---
 
-## Architecture
+## 📊 Performance & Governance
 
-High-level pipeline:
-
-```text
-Question
-  ↓
-TopicClassifier (scikit-learn)
-  ↓
-KnowledgeBase (notes/*.md retrieval)
-  ↓
-LLMClient (prompt construction + LLM call)
-  ↓
-SophiaResponse (technical answer, simple answer, follow-up, source_type)
-```
-
-Key modules:
-
-- `classifier.py` – trains & runs the topic classifier.  
-- `knowledge_base.py` – loads your notes and performs simple keyword-based retrieval.  
-- `llm_client.py` – centralizes prompt building + future LLM API calls.  
-- `pipeline.py` – orchestrates classify → retrieve → answer.  
-- `cli.py` – interactive terminal UX.  
+*   **Hallucination Rate:** Minimally observed on core topics due to "Sledgehammer" augmentation.
+*   **Data Lineage:** All training data is versioned in `ai-ml-backend-datasets`.
+*   **PII Safety:** Automated audit scripts run prior to every training job.
 
 ---
 
-## Tests
-
-Run tests with:
-
-```bash
-pytest
-```
-
-Tests cover:
-
-- Classifier: trains on a tiny sample and predicts a known topic.  
-- Knowledge base: returns relevant chunks given a topic hint.  
-- Pipeline: runs with a dummy LLMClient and returns a well-formed `SophiaResponse`.  
-
----
-
-## Next Steps
-
-- Add more topics and richer notes.  
-- Replace the stub LLM client with a real model.  
-- Add a simple web API (FastAPI/Flask) on top of `SophiaPipeline`.  
-- Log sessions to a DB to track your progress over time.  
-
-Sophia is intentionally small but complete: it shows you understand **ML, LLMs, RAG, and system design** in one focused project.
+**Author:** DJ Jordan
+**License:** Apache 2.0
