@@ -76,26 +76,26 @@ The system follows a modern **Instruction Tuning** pipeline:
 ```mermaid
 graph LR
     subgraph "User Interface"
-        CLI[CLI (bin/sophia)]
-        API[API Server (Future)]
+        CLI["CLI (bin/sophia)"]
+        API["API Server (Future)"]
     end
 
     subgraph "Core Library (src/sophia)"
-        PL[Pipeline Controller]
-        SCH[Schemas (Pydantic)]
-        CFG[Config Manager]
+        PL["Pipeline Controller"]
+        SCH["Schemas (Pydantic)"]
+        CFG["Config Manager"]
         
         subgraph "Engine Room"
-            TC[Topic Classifier]
-            KB[Knowledge Base (RAG)]
-            LLM[LLM Client (Inference)]
+            TC["Topic Classifier"]
+            KB["Knowledge Base (RAG)"]
+            LLM["LLM Client (Inference)"]
         end
     end
 
     subgraph "Data Layer"
-        RAW[(Raw Markdown)]
-        DB[(Processed Dataset)]
-        VEC[(Vector Store)]
+        RAW[("Raw Markdown")]
+        DB[("Processed Dataset")]
+        VEC[("Vector Store")]
     end
 
     %% Connections
