@@ -23,8 +23,8 @@ Unlike generic wrappers, Sophia operates on a **Full Ownership** model. She is n
 ```mermaid
 graph TD
     subgraph Inputs
-        T[Tokens] --> EMB[Input Embedding<br/>(d_model=1536)]
-        POS[Rotary Positional Embeddings<br/>(RoPE)] -.-> EMB
+        T[Tokens] --> EMB["Input Embedding<br/>(d_model=1536)"]
+        POS["Rotary Positional Embeddings<br/>(RoPE)"] -.-> EMB
     end
 
     EMB --> B0
@@ -32,20 +32,20 @@ graph TD
     subgraph "Transformer Block (Repeated 28x)"
         direction TB
         B0[Input] --> N1[RMSNorm]
-        N1 --> MHA[Masked Multi-Head Attention<br/>(12 Heads)]
+        N1 --> MHA["Masked Multi-Head Attention<br/>(12 Heads)"]
         
         MHA --> RES1((+))
         B0 --> RES1
         
         RES1 --> N2[RMSNorm]
-        N2 --> FFN[SwiGLU Feed-Forward<br/>(Intermediate=8960)]
+        N2 --> FFN["SwiGLU Feed-Forward<br/>(Intermediate=8960)"]
         
         FFN --> RES2((+))
         RES1 --> RES2
     end
 
     RES2 --> OUT_NORM[RMSNorm]
-    OUT_NORM --> HEAD[Linear Head<br/>(Vocab=151936)]
+    OUT_NORM --> HEAD["Linear Head<br/>(Vocab=151936)"]
     HEAD --> SOFT[Softmax]
     SOFT --> PROB[Next Token Probability]
 
