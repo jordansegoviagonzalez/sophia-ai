@@ -19,6 +19,43 @@ Unlike generic wrappers, Sophia operates on a **Full Ownership** model. She is n
 
 ## 🏗️ Architecture
 
+### Model Architecture (Transformer)
+```mermaid
+graph TD
+    subgraph Inputs
+        T[Tokens] --> EMB[Input Embedding<br/>(d_model=1536)]
+        POS[Rotary Positional Embeddings<br/>(RoPE)] -.-> EMB
+    end
+
+    EMB --> B0
+
+    subgraph "Transformer Block (Repeated 28x)"
+        direction TB
+        B0[Input] --> N1[RMSNorm]
+        N1 --> MHA[Masked Multi-Head Attention<br/>(12 Heads)]
+        
+        MHA --> RES1((+))
+        B0 --> RES1
+        
+        RES1 --> N2[RMSNorm]
+        N2 --> FFN[SwiGLU Feed-Forward<br/>(Intermediate=8960)]
+        
+        FFN --> RES2((+))
+        RES1 --> RES2
+    end
+
+    RES2 --> OUT_NORM[RMSNorm]
+    OUT_NORM --> HEAD[Linear Head<br/>(Vocab=151936)]
+    HEAD --> SOFT[Softmax]
+    SOFT --> PROB[Next Token Probability]
+
+    classDef layer fill:#21262d,stroke:#58a6ff,stroke-width:2px;
+    classDef math fill:#1f6feb,stroke:#fff,color:white;
+    
+    class EMB,MHA,FFN,HEAD layer;
+    class RES1,RES2 math;
+```
+
 The system follows a modern **Instruction Tuning** pipeline:
 
 1.  **Ingestion:** Raw Markdown notes are ingested from `ai-ml-backend-datasets`.
@@ -34,6 +71,45 @@ The system follows a modern **Instruction Tuning** pipeline:
 ---
 
 ## 📂 Project Structure
+
+### System Map
+```mermaid
+graph LR
+    subgraph "User Interface"
+        CLI[CLI (bin/sophia)]
+        API[API Server (Future)]
+    end
+
+    subgraph "Core Library (src/sophia)"
+        PL[Pipeline Controller]
+        SCH[Schemas (Pydantic)]
+        CFG[Config Manager]
+        
+        subgraph "Engine Room"
+            TC[Topic Classifier]
+            KB[Knowledge Base (RAG)]
+            LLM[LLM Client (Inference)]
+        end
+    end
+
+    subgraph "Data Layer"
+        RAW[(Raw Markdown)]
+        DB[(Processed Dataset)]
+        VEC[(Vector Store)]
+    end
+
+    %% Connections
+    CLI -->|Request| PL
+    PL -->|Validate| SCH
+    PL -->|Load| CFG
+    
+    PL -->|1. Predict| TC
+    PL -->|2. Retrieve| KB
+    PL -->|3. Generate| LLM
+
+    KB -.->|Read| VEC
+    TC -.->|Load| DB
+```
 
 ```text
 sophia-ai/
