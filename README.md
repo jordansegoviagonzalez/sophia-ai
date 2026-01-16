@@ -19,43 +19,44 @@ Unlike generic wrappers, Sophia operates on a **Full Ownership** model. She is n
 
 ## 🏗️ Architecture
 
-### 🧠 Neural Network Architecture (Transformer Decoder)
+### Model Architecture (Transformer)
 The core model is a **1.5B parameter Decoder-Only Transformer** based on Qwen 2.5. It utilizes **Rotary Positional Embeddings (RoPE)** for long-context handling and **SwiGLU** activation functions for enhanced reasoning capabilities.
 
 ```mermaid
 graph TD
-    subgraph Inputs
-        T[Tokens] --> EMB["Input Embedding<br/>(d_model=1536)"]
-        POS["Rotary Positional Embeddings<br/>(RoPE)"] -.-> EMB
+    %% Cyberpunk / Scientific Color Palette
+    classDef input fill:#161b22,stroke:#58a6ff,stroke-width:2px,color:#a5d6ff;
+    classDef attn fill:#161b22,stroke:#bc8cff,stroke-width:2px,color:#d2a8ff;
+    classDef ffn fill:#161b22,stroke:#ff7b72,stroke-width:2px,color:#ffa198;
+    classDef norm fill:#161b22,stroke:#8b949e,stroke-width:1px,stroke-dasharray: 3 3,color:#c9d1d9;
+    classDef output fill:#161b22,stroke:#3fb950,stroke-width:2px,color:#56d364;
+    classDef residual fill:#1f6feb,stroke:none,color:#ffffff,font-weight:bold;
+
+    subgraph "Context Window (32k Tokens)"
+        TOK["Tokens (Input)"]:::input --> EMB["Embedding Layer<br/>(d=1536)"]:::input
+        ROPE["RoPE (Rotary Pos)"]:::input -.-> EMB
     end
 
-    EMB --> B0
+    EMB --> PRE_NORM_1[RMSNorm]:::norm
 
-    subgraph "Transformer Block (Repeated 28x)"
+    subgraph "Transformer Layer (x28)"
         direction TB
-        B0[Input] --> N1[RMSNorm]
-        N1 --> MHA["Masked Multi-Head Attention<br/>(12 Heads)"]
         
-        MHA --> RES1((+))
-        B0 --> RES1
+        PRE_NORM_1 --> MHA["Masked Multi-Head Attention<br/>(12 Heads)"]:::attn
+        MHA --> ADD_1((+)):::residual
+        EMB -.->|Residual| ADD_1
         
-        RES1 --> N2[RMSNorm]
-        N2 --> FFN["SwiGLU Feed-Forward<br/>(Intermediate=8960)"]
+        ADD_1 --> PRE_NORM_2[RMSNorm]:::norm
+        PRE_NORM_2 --> FFN["SwiGLU FFN<br/>(Intermediate=8960)"]:::ffn
         
-        FFN --> RES2((+))
-        RES1 --> RES2
+        FFN --> ADD_2((+)):::residual
+        ADD_1 -.->|Residual| ADD_2
     end
 
-    RES2 --> OUT_NORM[RMSNorm]
-    OUT_NORM --> HEAD["Linear Head<br/>(Vocab=151936)"]
-    HEAD --> SOFT[Softmax]
-    SOFT --> PROB[Next Token Probability]
-
-    classDef layer fill:#21262d,stroke:#58a6ff,stroke-width:2px;
-    classDef math fill:#1f6feb,stroke:#fff,color:white;
-    
-    class EMB,MHA,FFN,HEAD layer;
-    class RES1,RES2 math;
+    ADD_2 --> FINAL_NORM[RMSNorm]:::norm
+    FINAL_NORM --> LM_HEAD["Linear Head<br/>(Vocab=151k)"]:::output
+    LM_HEAD --> SOFT[Softmax]:::output
+    SOFT --> PROB["Next Token Output"]:::output
 ```
 
 The system follows a modern **Instruction Tuning** pipeline:
