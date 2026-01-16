@@ -20,8 +20,6 @@ Unlike generic wrappers, Sophia operates on a **Full Ownership** model. She is n
 ## 🏗️ Architecture
 
 ### Model Architecture (Transformer)
-The core model is a **1.5B parameter Decoder-Only Transformer** based on Qwen 2.5. It utilizes **Rotary Positional Embeddings (RoPE)** for long-context handling and **SwiGLU** activation functions for enhanced reasoning capabilities.
-
 ```mermaid
 graph TD
     %% Cyberpunk / Scientific Color Palette
