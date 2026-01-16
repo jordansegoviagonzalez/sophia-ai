@@ -29,14 +29,14 @@ class LLMClient:
             # Load the standalone model directly
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_path, 
-                dtype=torch.float16 if self.device != "cpu" else torch.float32
+                torch_dtype=torch.float16 if self.device != "cpu" else torch.float32
             )
         else:
             print(f"Custom model not found at {model_path}. Falling back to base {base_model_id}...")
             self.tokenizer = AutoTokenizer.from_pretrained(base_model_id)
             self.model = AutoModelForCausalLM.from_pretrained(
                 base_model_id, 
-                dtype=torch.float16 if self.device != "cpu" else torch.float32
+                torch_dtype=torch.float16 if self.device != "cpu" else torch.float32
             )
 
         self.model.to(self.device)

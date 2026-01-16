@@ -1,0 +1,13 @@
+pandas
+scikit-learn
+joblib
+openai
+python-dotenv
+pydantic
+
+[dev]
+pytest
+black
+isort
+mypy
+flake8

@@ -1,0 +1,23 @@
+Metadata-Version: 2.4
+Name: sophia
+Version: 0.1.0
+Summary: Sophia AI Engine
+Author-email: DJ Jordan <dj@example.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.9
+License-File: LICENSE
+Requires-Dist: pandas
+Requires-Dist: scikit-learn
+Requires-Dist: joblib
+Requires-Dist: openai
+Requires-Dist: python-dotenv
+Requires-Dist: pydantic
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+Requires-Dist: mypy; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
+Dynamic: license-file
