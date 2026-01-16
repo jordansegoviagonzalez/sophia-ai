@@ -44,11 +44,9 @@ def main() -> None:
         console.print(f"[dim]Source: {response.source_type}[/dim]")
         
         console.print("\n[bold]Technical answer:[/bold]")
-        console.print(response.technical_answer)
-        console.print("\n[bold]Simple explanation:[/bold]")
-        console.print(response.simple_explanation)
+        console.print(response.technical_answer, markup=False)
         console.print("\n[bold]Follow-up question:[/bold]")
-        console.print(response.follow_up_question)
+        console.print(response.follow_up_question, markup=False)
         console.print("=" * 60 + "\n")
 
 

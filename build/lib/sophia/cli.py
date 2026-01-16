@@ -10,7 +10,10 @@ def main() -> None:
     console.print("[bold cyan]Sophia 🧠 – Interview Question Coach[/bold cyan]")
     console.print("Type 'exit' to quit.\n")
 
-    pipeline = SophiaPipeline()
+    with console.status("[bold green]Loading Sophia Neural Network... (This may take a moment)[/bold green]", spinner="dots"):
+        pipeline = SophiaPipeline()
+    
+    console.print("[dim]Model loaded successfully.[/dim]\n")
 
     while True:
         question = console.input("[bold green]Your interview question> [/bold green]").strip()
@@ -41,11 +44,9 @@ def main() -> None:
         console.print(f"[dim]Source: {response.source_type}[/dim]")
         
         console.print("\n[bold]Technical answer:[/bold]")
-        console.print(response.technical_answer)
-        console.print("\n[bold]Simple explanation:[/bold]")
-        console.print(response.simple_explanation)
+        console.print(response.technical_answer, markup=False)
         console.print("\n[bold]Follow-up question:[/bold]")
-        console.print(response.follow_up_question)
+        console.print(response.follow_up_question, markup=False)
         console.print("=" * 60 + "\n")
 
 

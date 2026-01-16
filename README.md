@@ -1,5 +1,7 @@
 ![alt text](Sophia-AI.png)
-# Sophia AI - Enterprise Interview Coach
+# Sophia AI - A Standalone Local LLM for Technical Interview Coaching (100% Offline, No Cloud Calls) 
+![alt text](<Sophia V1- A Standalone Local LLM for Technical Interview Coaching.gif>)
+
 
 **Sophia** is a domain-specific, fine-tuned Large Language Model (LLM) designed to act as an expert technical interviewer for AI/ML, Backend, and MLOps roles.
 
