@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sophia AI - Project Structure</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.js';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'dark',
+            flowchart: { curve: 'monotoneX' }
+        });
+    </script>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        .diagram-container {
+            background-color: #161b22;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sophia AI - System Map</h1>
+    <div class="diagram-container">
+        <pre class="mermaid">
+        graph LR
+            subgraph "User Interface"
+                CLI[CLI (bin/sophia)]
+                API[API Server (Future)]
+            end
+
+            subgraph "Core Library (src/sophia)"
+                PL[Pipeline Controller]
+                SCH[Schemas (Pydantic)]
+                CFG[Config Manager]
+                
+                subgraph "Engine Room"
+                    TC[Topic Classifier]
+                    KB[Knowledge Base (RAG)]
+                    LLM[LLM Client (Inference)]
+                end
+            end
+
+            subgraph "Data Layer"
+                RAW[(Raw Markdown)]
+                DB[(Processed Dataset)]
+                VEC[(Vector Store)]
+            end
+
+            %% Connections
+            CLI -->|Request| PL
+            PL -->|Validate| SCH
+            PL -->|Load| CFG
+            
+            PL -->|1. Predict| TC
+            PL -->|2. Retrieve| KB
+            PL -->|3. Generate| LLM
+
+            KB -.->|Read| VEC
+            TC -.->|Load| DB
+        </pre>
+    </div>
+</body>
+</html>

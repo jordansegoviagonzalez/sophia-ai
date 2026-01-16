@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sophia"
+version = "0.1.0"
+description = "Sophia AI Engine"
+authors = [
+  { name = "DJ Jordan", email = "dj@example.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "openai",
+    "python-dotenv",
+    "pydantic",  # Useful for schemas
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+    "mypy",
+    "flake8"
+]
+
+[project.scripts]
+sophia = "sophia.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

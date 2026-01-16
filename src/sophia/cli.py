@@ -28,7 +28,18 @@ def main() -> None:
             continue
 
         console.print("\n" + "=" * 60)
-        console.print(f"[bold]Topic:[/bold] {response.topic}   [bold]Source:[/bold] {response.source_type}")
+        
+        # Format confidence as percentage if it exists
+        conf_str = f"{response.confidence_score:.1%}" if response.confidence_score is not None else "N/A"
+        lat_str = f"{response.latency_ms}ms" if response.latency_ms is not None else "N/A"
+        
+        header = (
+            f"[bold]Topic:[/bold] {response.topic} | "
+            f"[dim]Conf: {conf_str} | Latency: {lat_str}[/dim]"
+        )
+        console.print(header)
+        console.print(f"[dim]Source: {response.source_type}[/dim]")
+        
         console.print("\n[bold]Technical answer:[/bold]")
         console.print(response.technical_answer)
         console.print("\n[bold]Simple explanation:[/bold]")

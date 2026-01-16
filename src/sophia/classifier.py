@@ -62,3 +62,18 @@ class TopicClassifier:
             self.load()
         assert self.pipeline is not None
         return str(self.pipeline.predict([question])[0])
+
+    def predict_proba(self, question: str) -> float:
+        """
+        Returns the confidence score (0.0 to 1.0) for the predicted topic.
+        """
+        if self.pipeline is None:
+            self.load()
+        assert self.pipeline is not None
+        
+        # Get probability distribution for the single sample
+        # shape is (1, n_classes)
+        probs = self.pipeline.predict_proba([question])[0]
+        
+        # Return the highest probability (confidence)
+        return float(probs.max())
